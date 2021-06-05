@@ -12,11 +12,23 @@ if __name__ == '__main__':
   controller = sx1268.Controller()
 
   try:
-    controller.mode = sx1268.OperatingMode.Configuration
-    controller.writeRegister(register = sx1268.Registers.REG2)
 
-    output = controller.readRegister(register = sx1268.Registers.REG2)
-    hexPrint(output)
+    controller.address = 0xFFFF
+    controller.channel = 0x1
+    controller.networkId = 0x5
+    controller.mode = sx1268.OperatingMode.Transmission
+
+    ## run on RPI 0 
+    for message in controller.listen():
+      print(message)
+    
+    ## run on RPI 1
+    controller.mode = sx1268.OperatingMode.Configuration
+    controller.address = 0x0
+    controller.mode = sx1268.OperatingMode.Transmission
+
+    controller.sendMessage("I'm hunting for nazis behind The Moon!")
+    ##
 
   except Exception:
     print(traceback.format_exc())
