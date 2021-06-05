@@ -145,22 +145,22 @@ class Controller():
     self._mode = None
 
     ## Used for parameters tracking
-    self._address = 0x0000
-    self._networkId = 0x00
+    self._address = 0x0
+    self._networkId = 0x0
     self._baudRate = BaudRate._9600
     self._parityBit = ParityBit._8N1
     self._airSpeed = AirSpeed._4800
     self._packetSize = PacketSize._240B
     self._ambientNoise = AmbientNoise.Disabled
     self._transmitPower = TransmitPower._22dBm
-    self._channel = 0x00
+    self._channel = 0x0
     self._rssi = RSSI.Disabled
     self._transmittingMode = TransmittingMode.Transparent
     self._relay = Relay.Disabled
     self._listenBeforeTransmit = ListenBeforeTransmit.Disabled
     self._worMode = WORMode.Transmit
     self._worPeriod = WORPeriod._500ms
-    self._encryptionKey = 0x0000
+    self._encryptionKey = 0x0
 
     ## Used for register tracking
     # Read/Write
@@ -209,7 +209,7 @@ class Controller():
   def address(self, value):
     print('address setter')
     if value < 0x0 or value > 0xFFFF:
-      raise ValueError("Address out of range 0x0000 - 0xFFFF")
+      raise ValueError("Address out of range 0x0 - 0xFFFF")
     
     self._address = value
     self.setRegisterFromParameter(Registers.ADDH)
@@ -222,7 +222,7 @@ class Controller():
   @networkId.setter
   def networkId(self, value):
     if value < 0x0 or value > 0xFF:
-      raise ValueError('NetworkID out of range 0x00 - 0xFF')
+      raise ValueError('NetworkID out of range 0x0 - 0xFF')
 
     self._networkId = value
     self.setRegisterFromParameter(Registers.NETID)
@@ -341,8 +341,8 @@ class Controller():
 
   @encryptionKey.setter
   def encryptionKey(self, value : int):
-    if value < 0x0000 or value > 0xFFFF:
-      raise ValueError('Encryption key not in range 0x0000 - 0xFFFF')
+    if value < 0x0 or value > 0xFFFF:
+      raise ValueError('Encryption key not in range 0x0 - 0xFFFF')
     self._encryptionKey = value
     self.setRegisterFromParameter(Registers.CRYPT_H)
     self.setRegisterFromParameter(Registers.CRYPT_L)
@@ -376,7 +376,7 @@ class Controller():
     if register == Registers.ADDH:
       self._ADDH   = (self._address & 0xFF00) >> 8
     elif register == Registers.ADDL:
-      self._ADDL   = self._address & 0x00FF
+      self._ADDL   = self._address & 0xFF
     elif register == Registers.NETID:
       self._NETID  = self._networkId & 0xFF
     elif register == Registers.REG0:
@@ -405,7 +405,7 @@ class Controller():
     elif register == Registers.CRYPT_H:
       self._CRYPT_H = 0xFF00 & self._encryptionKey
     elif register == Registers.CRYPT_L:
-      self._CRYPT_L = 0x00FF & self._encryptionKey
+      self._CRYPT_L = 0xFF & self._encryptionKey
 
   # # write configuration to physical register
   def writeRegister(self, register : Registers, writeWaitTime : float = 0.1):
