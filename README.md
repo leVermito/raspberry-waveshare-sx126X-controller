@@ -30,7 +30,7 @@ With that in mind we have to free up this line from other devices.
 *Listen for All messages on network 5 and print them to console*
 
 ```python
-import sx1268
+from waveshareSX126 import sx1268
 
 # initialize hat with default parameters using ttyAMA0 serial
 # by default hat will be set to:  
@@ -38,7 +38,7 @@ import sx1268
 # networkID : 0x0
 # channel   : 0x0 
 # mode      : configuration
-controller = sx1268.Controller(serial = "/dev/ttyAMA0")
+controller = sx1268.Controller(serialPipe = "/dev/ttyAMA0")
 
 # set HAT address to be broadcast & monitor 0xFFFF
 controller.address = 0xFFFF
@@ -57,7 +57,7 @@ for message in controller.listen():
 #### Send P2P message
 *Send P2P message on address 0xB8, network 0x5 every 5 seconds*
 ```python
-import sx1268
+from waveshareSX126 import sx1268
 
 import time
 
@@ -67,7 +67,7 @@ import time
 # networkID : 0x0
 # channel   : 0x0 
 # mode      : configuration
-controller = sx1268.Controller(serial = "/dev/ttyAMA0")
+controller = sx1268.Controller(serialPipe = "/dev/ttyAMA0")
 
 # set HAT address to 0xB8
 controller.address = 0xB8
@@ -92,7 +92,7 @@ while True:
 #### Operate in Watch / WOR mode.
 *Send P2P message every 5 seconds, listen on incoming P2P messages*
 ```python
-import sx1268
+from waveshareSX126 import sx1268
 
 import time
 

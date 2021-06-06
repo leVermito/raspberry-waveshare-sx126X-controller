@@ -187,8 +187,10 @@ class Controller():
     self.mode = OperatingMode.Configuration
 
     for register in Registers:
-      self.setRegisterFromParameter(register = register)
-      self.writeRegister(register = register)
+      self._setRegisterFromParameter(register = register)
+      self._writeRegister(register = register)
+    
+    print(self.serialPipe.read_all())
 
   @property
   def mode(self):
@@ -221,8 +223,8 @@ class Controller():
       raise ValueError("Address out of range 0x0 - 0xFFFF")
     
     self._address = value
-    self.setRegisterFromParameter(register = Registers.ADDH)
-    self.setRegisterFromParameter(register = Registers.ADDL)
+    self._setRegisterFromParameter(register = Registers.ADDH)
+    self._setRegisterFromParameter(register = Registers.ADDL)
 
   @property
   def networkId(self):
@@ -234,7 +236,7 @@ class Controller():
       raise ValueError('NetworkID out of range 0x0 - 0xFF')
 
     self._networkId = value
-    self.setRegisterFromParameter(register = Registers.NETID)
+    self._setRegisterFromParameter(register = Registers.NETID)
   
   @property
   def baudRate(self):
@@ -243,7 +245,7 @@ class Controller():
   @baudRate.setter
   def baudRate(self, value):
     self._baudRate = value
-    self.setRegisterFromParameter(register = Registers.REG0)
+    self._setRegisterFromParameter(register = Registers.REG0)
 
   @property
   def parityBit(self):
@@ -252,7 +254,7 @@ class Controller():
   @parityBit.setter
   def parityBit(self, value : ParityBit):
     self._parityBit = value
-    self.setRegisterFromParameter(register = Registers.REG0)
+    self._setRegisterFromParameter(register = Registers.REG0)
 
   @property
   def airSpeed(self):
@@ -261,7 +263,7 @@ class Controller():
   @airSpeed.setter
   def airSpeed(self, value : AirSpeed):
     self._airSpeed = value
-    self.setRegisterFromParameter(register = Registers.REG0)
+    self._setRegisterFromParameter(register = Registers.REG0)
 
   @property
   def packetSize(self):
@@ -270,7 +272,7 @@ class Controller():
   @packetSize.setter
   def packetSize(self, value : PacketSize):
     self._packetSize = value
-    self.setRegisterFromParameter(register = Registers.REG1)
+    self._setRegisterFromParameter(register = Registers.REG1)
 
   @property
   def ambientNoise(self):
@@ -279,7 +281,7 @@ class Controller():
   @ambientNoise.setter
   def ambientNoise(self, value : AmbientNoise):
     self._ambientNoise = value
-    self.setRegisterFromParameter(register = Registers.REG1)
+    self._setRegisterFromParameter(register = Registers.REG1)
 
   @property
   def transmitPower(self):
@@ -296,7 +298,7 @@ class Controller():
   @channel.setter
   def channel(self, value : int):
     self._channel = value
-    self.setRegisterFromParameter(register = Registers.REG2)
+    self._setRegisterFromParameter(register = Registers.REG2)
 
   @property
   def rssi(self):
@@ -305,7 +307,7 @@ class Controller():
   @rssi.setter
   def rssi(self, value : rssi):
     self._rssi = value
-    self.setRegisterFromParameter(register = Registers.REG3)
+    self._setRegisterFromParameter(register = Registers.REG3)
 
   @property
   def transmittingMode(self):
@@ -314,7 +316,7 @@ class Controller():
   @transmittingMode.setter
   def transmittingMode(self, value : TransmittingMode):
     self._transmittingMode = value
-    self.setRegisterFromParameter(register = Registers.REG3)
+    self._setRegisterFromParameter(register = Registers.REG3)
 
   @property
   def relay(self):
@@ -323,7 +325,7 @@ class Controller():
   @relay.setter
   def relay(self, value : Relay):
     self._relay = value
-    self.setRegisterFromParameter(register = Registers.REG3)
+    self._setRegisterFromParameter(register = Registers.REG3)
 
   @property
   def listenBeforeTransmit(self):
@@ -332,7 +334,7 @@ class Controller():
   @listenBeforeTransmit.setter
   def listenBeforeTransmit(self, value : ListenBeforeTransmit):
     self._listenBeforeTransmit = value
-    self.setRegisterFromParameter(register = Registers.REG3)
+    self._setRegisterFromParameter(register = Registers.REG3)
 
   @property
   def worMode(self):
@@ -341,7 +343,7 @@ class Controller():
   @worMode.setter
   def worMode(self, value : worMode):
     self._worMode = value
-    self.setRegisterFromParameter(register = Registers.REG3)
+    self._setRegisterFromParameter(register = Registers.REG3)
     
   @property
   def worPeriod(self):
@@ -350,7 +352,7 @@ class Controller():
   @worPeriod.setter
   def worPeriod(self, value : worPeriod):
     self._worPeriod = value
-    self.setRegisterFromParameter(register = Registers.REG3)
+    self._setRegisterFromParameter(register = Registers.REG3)
     
   @property
   def encryptionKey(self):
@@ -361,10 +363,10 @@ class Controller():
     if value < 0x0 or value > 0xFFFF:
       raise ValueError('Encryption key not in range 0x0 - 0xFFFF')
     self._encryptionKey = value
-    self.setRegisterFromParameter(register = Registers.CRYPT_H)
-    self.setRegisterFromParameter(register = Registers.CRYPT_L)
+    self._setRegisterFromParameter(register = Registers.CRYPT_H)
+    self._setRegisterFromParameter(register = Registers.CRYPT_L)
 
-  def getRegisterValueByRegisterNumber(self, registerNumber : int):
+  def _getRegisterValueByRegisterNumber(self, registerNumber : int):
     if registerNumber == 0x0:
       return self._ADDH
     elif registerNumber == 0x1:
@@ -389,7 +391,7 @@ class Controller():
       raise Exceptions.RegisterNotFound(f'Register {registerNumber} not found.')
 
   # set register value from corresponding parameters
-  def setRegisterFromParameter(self, register : Registers):
+  def _setRegisterFromParameter(self, register : Registers):
     if register == Registers.ADDH:
       self._ADDH   = (self.address & 0xFF00) >> 8
     elif register == Registers.ADDL:
@@ -423,16 +425,16 @@ class Controller():
       self._CRYPT_H = 0xFF00 & self._encryptionKey
     elif register == Registers.CRYPT_L:
       self._CRYPT_L = 0xFF & self._encryptionKey
-    self.writeRegister(register = register)
+    self._writeRegister(register = register)
 
   # # write configuration to physical register
-  def writeRegister(self, register : Registers, writeWaitTime : float = 0.1):
+  def _writeRegister(self, register : Registers, writeWaitTime : float = 0.1):
 
     if self.mode != OperatingMode.Configuration:
       raise Exceptions.OperatingModeMismatch(f'Attempted write in {self.mode}')
 
     if self.serialPipe.isOpen():
-      payload = bytearray([0xC2, register.value, 0x01, self.getRegisterValueByRegisterNumber(register.value)])
+      payload = bytearray([0xC2, register.value, 0x01, self._getRegisterValueByRegisterNumber(register.value)])
       self.serialPipe.write(payload)
       time.sleep(writeWaitTime)
     else:
@@ -445,7 +447,7 @@ class Controller():
       raise Exceptions.AnswerMissMatch(f'Payload: {payload}, Answer: {answer}')
 
   # read configuration from physical register
-  def readRegister(self, register : Registers, writeWaitTime : float = 0.1):
+  def _readRegister(self, register : Registers, writeWaitTime : float = 0.1):
     if self.serialPipe.isOpen():
       payload = bytearray([0xC1, register.value, 0x01])
       self.serialPipe.write(payload)
@@ -457,6 +459,11 @@ class Controller():
       raise Exceptions.CommunicationSerialPipeClosed
 
   def messageAvailable(self):
+    """Checks if message is awating in HAT serial output.
+    
+    :returns: bool - True if message awaits, False otherwise
+    :rtype: bool
+    """
 
     if self.mode != OperatingMode.Transmission and self.mode != OperatingMode.Watch:
       raise Exceptions.OperatingModeMismatch(f'Tried to read message in {self.mode}')
@@ -470,6 +477,11 @@ class Controller():
       return False
 
   def readMessages(self):
+    """Reads message if until HAT serial pipe is empty
+    
+    :returns: bytearray generator with message
+    :rtype: generator
+    """
 
     if self.mode != OperatingMode.Transmission and self.mode != OperatingMode.Watch:
       raise Exceptions.OperatingModeMismatch(f'Tried to read message in {self.mode}')
@@ -482,6 +494,11 @@ class Controller():
       time.sleep(0.1)
 
   def listen(self):
+    """Infinitely reads messages from HAT serial pipe
+
+    :returns: bytearray generator with messages
+    :rtype: generator
+    """
 
     if self.mode != OperatingMode.Transmission and self.mode != OperatingMode.Watch:
       raise Exceptions.OperatingModeMismatch(f'Tried to listen in {self.mode}')
@@ -493,13 +510,16 @@ class Controller():
       time.sleep(0.1)
 
   def sendMessage(self, message : str):
+    """Send message via HAT
+    
+    :param message: string message to be sent
+    """
     
     if self.mode != OperatingMode.Transmission and self.mode != OperatingMode.Watch:
       raise Exceptions.OperatingModeMismatch(f'Tried to send message in {self.mode}')
 
     if self.serialPipe.isOpen():
-      size = self.serialPipe.write(message.encode())
-      print(f'message has been sent, size: {size}')
-
+      self.serialPipe.write(message.encode())
+      
   def cleanup(self):
     GPIO.cleanup()  
