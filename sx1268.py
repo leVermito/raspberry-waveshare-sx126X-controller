@@ -197,8 +197,8 @@ class Controller():
   @mode.setter
   def mode(self, value : OperatingMode):
     if value == OperatingMode.Transmission:
-      GPIO.output(self.M0,GPIO.HIGH)
-      GPIO.output(self.M1,GPIO.HIGH)
+      GPIO.output(self.M0, GPIO.LOW)
+      GPIO.output(self.M1, GPIO.LOW)
     elif value == OperatingMode.Watch:
       GPIO.output(self.M0, GPIO.HIGH)
       GPIO.output(self.M1, GPIO.LOW)
@@ -206,8 +206,8 @@ class Controller():
       GPIO.output(self.M0,GPIO.LOW)
       GPIO.output(self.M1,GPIO.HIGH)
     elif value == OperatingMode.DeepSleep:
-      GPIO.output(self.M0, GPIO.LOW)
-      GPIO.output(self.M1, GPIO.LOW)
+      GPIO.output(self.M0,GPIO.HIGH)
+      GPIO.output(self.M1,GPIO.HIGH)
     time.sleep(1)
     self._mode = value
 
@@ -432,7 +432,7 @@ class Controller():
       raise Exceptions.OperatingModeMismatch(f'Attempted write in {self.mode}')
 
     if self.serialPipe.isOpen():
-      payload = bytearray([0xC0, register.value, 0x01, self.getRegisterValueByRegisterNumber(register.value)])
+      payload = bytearray([0xC2, register.value, 0x01, self.getRegisterValueByRegisterNumber(register.value)])
       self.serialPipe.write(payload)
       time.sleep(writeWaitTime)
     else:
@@ -465,15 +465,14 @@ class Controller():
     while True:
       output = self.serialPipe.read(size = self.serialPipe.inWaiting())
       if output != b'':
-        print(output)
         yield output
       time.sleep(0.1)
 
   def sendMessage(self, message : str):
     
     if self.serialPipe.isOpen():
-      self.serialPipe.write(message.encode())
-    print('message has been sent')
+      size = self.serialPipe.write(message.encode())
+      print(f'message has been sent, size: {size}')
 
   def cleanup(self):
     GPIO.cleanup()  
