@@ -456,11 +456,35 @@ class Controller():
     else:
       raise Exceptions.CommunicationSerialPipeClosed
 
+  def messageAvailable(self):
+
+    if self.mode != OperatingMode.Transmission and self.mode != OperatingMode.Watch:
+      raise Exceptions.OperatingModeMismatch(f'Tried to read message in {self.mode}')
+
+    if not self.serialPipe.isOpen():
+      raise Exceptions.CommunicationSerialPipeClosed
+
+    if self.serialPipe.inWaiting() > 0:
+      return True
+    else:
+      return False
+
+  def readMessages(self):
+
+    if self.mode != OperatingMode.Transmission and self.mode != OperatingMode.Watch:
+      raise Exceptions.OperatingModeMismatch(f'Tried to read message in {self.mode}')
+
+    while True:
+      output = self.serialPipe.read(size = self.serialPipe.inWaiting())
+      if output == b'':
+        break
+      yield output
+      time.sleep(0.1)
+
   def listen(self):
 
-    if self.mode != OperatingMode.Transmission:
-      print(f'Setting mode from {self.mode} to {OperatingMode.Transmission}')
-      self.mode = OperatingMode.Transmission
+    if self.mode != OperatingMode.Transmission and self.mode != OperatingMode.Watch:
+      raise Exceptions.OperatingModeMismatch(f'Tried to listen in {self.mode}')
     
     while True:
       output = self.serialPipe.read(size = self.serialPipe.inWaiting())
@@ -470,6 +494,9 @@ class Controller():
 
   def sendMessage(self, message : str):
     
+    if self.mode != OperatingMode.Transmission and self.mode != OperatingMode.Watch:
+      raise Exceptions.OperatingModeMismatch(f'Tried to send message in {self.mode}')
+
     if self.serialPipe.isOpen():
       size = self.serialPipe.write(message.encode())
       print(f'message has been sent, size: {size}')
