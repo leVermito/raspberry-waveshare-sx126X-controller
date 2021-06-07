@@ -13,18 +13,33 @@ With that in mind we have to free up this line from other devices.
 
 #### Raspbian
 
-/boot/config.txt should contain:
+*/boot/config.txt should contain:*
 
 `enable_uart=1`
 
 #### ArchlinuxARM
-/boot/config.txt should contain:
+*/boot/config.txt should contain:*
 `dtoverlay=uart0` 
 
 `config.txt` can contain multiple dtoverlay definitions
 
+```bash
+# If you're struggling to install RPi.GPIO and you have GCC version > 10 use
+export CFLAGS=-fcommon
 
-### Step 1: Examples!
+pip install RPi.GPIO 
+# or 
+pip install waveshareSX126
+```
+
+### Step 1: Installation
+
+```bash
+pip install waveshareSX126
+```
+
+
+### Step 2: Examples!
 
 #### Set HAT to 'monitor mode'
 *Listen for All messages on network 5 and print them to console*
