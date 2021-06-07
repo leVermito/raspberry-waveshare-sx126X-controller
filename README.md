@@ -98,7 +98,7 @@ i = 0
 
 while True:
 
-  if time.time() - start_time > 10:
+  if time.time() - start_time > 5:
     controller.sendMessage(f"This is message number: {i}")
     start_time = time.time()
     i += 1
