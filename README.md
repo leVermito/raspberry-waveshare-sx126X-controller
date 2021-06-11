@@ -29,13 +29,13 @@ export CFLAGS=-fcommon
 
 pip install RPi.GPIO 
 # or 
-pip install waveshareSX126
+pip install wssx126
 ```
 
 ### Step 1: Installation
 
 ```bash
-pip install waveshareSX126
+pip install wssx126
 ```
 
 
@@ -45,7 +45,7 @@ pip install waveshareSX126
 *Listen for All messages on network 5 and print them to console*
 
 ```python
-from waveshareSX126 import sx1268
+from wssx126 import sx1268
 
 # initialize hat with default parameters using ttyAMA0 serial
 # by default hat will be set to:  
@@ -53,7 +53,8 @@ from waveshareSX126 import sx1268
 # networkID : 0x0
 # channel   : 0x0 
 # mode      : configuration
-controller = sx1268.Controller(serialPipe = "/dev/ttyAMA0")
+controller = sx1268.Controller()
+controller.initialize(serialPipe = "/dev/ttyAMA0")
 
 # set HAT address to be broadcast & monitor 0xFFFF
 controller.address = 0xFFFF
@@ -72,7 +73,7 @@ for message in controller.listen():
 #### Send P2P message
 *Send P2P message on address 0xB8, network 0x5 every 5 seconds*
 ```python
-from waveshareSX126 import sx1268
+from wssx126 import sx1268
 
 import time
 
@@ -82,7 +83,8 @@ import time
 # networkID : 0x0
 # channel   : 0x0 
 # mode      : configuration
-controller = sx1268.Controller(serialPipe = "/dev/ttyAMA0")
+controller = sx1268.Controller()
+controller.initialize(serialPipe = "/dev/ttyAMA0")
 
 # set HAT address to 0xB8
 controller.address = 0xB8
@@ -107,11 +109,12 @@ while True:
 #### Operate in Watch / WOR mode.
 *Send P2P message every 5 seconds, listen on incoming P2P messages*
 ```python
-from waveshareSX126 import sx1268
+from wssx126 import sx1268
 
 import time
 
 controller = sx1268.Controller()
+controller.initialize()
 
 # set HAT address to 0xB8
 controller.address = 0xB8

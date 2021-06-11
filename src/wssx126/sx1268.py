@@ -129,20 +129,11 @@ class Exceptions:
 
 class Controller():
 
-  def __init__(self, M0=22, M1=27, serialPipe = "/dev/ttyAMA0"):
+  def __init__(self, M0=22, M1=27):
 
     # waveshare hat is using BCM 22 and 27 pins as jumpers for operating mode management
     self.M0 = M0
     self.M1 = M1
-
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(True)
-    GPIO.setup(self.M0,GPIO.OUT)
-    GPIO.setup(self.M1,GPIO.OUT)
-
-    self.serialPipe = serial.Serial(serialPipe, 9600)
-    self.serialPipe.flushInput()
-    self.serialPipe.flushOutput()
 
     ### Properties / Setters set
 
@@ -183,14 +174,24 @@ class Controller():
     # Read
     self._PID = 0x0
 
+  def initialize(self, serialPipe = "/dev/ttyAMA0"):
+
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(True)
+    GPIO.setup(self.M0,GPIO.OUT)
+    GPIO.setup(self.M1,GPIO.OUT)
+
+    self.serialPipe = serial.Serial(serialPipe, 9600)
+    
     # Configure defaults 
     self.mode = OperatingMode.Configuration
+
+    self.serialPipe.flushInput()
+    self.serialPipe.flushOutput()
 
     for register in Registers:
       self._setRegisterFromParameter(register = register)
       self._writeRegister(register = register)
-    
-    print(self.serialPipe.read_all())
 
   @property
   def mode(self):
@@ -288,7 +289,7 @@ class Controller():
     return self._transmitPower
 
   @transmitPower.setter
-  def TransmitPower(self, value : TransmitPower):
+  def transmitPower(self, value : TransmitPower):
     self._transmitPower = value
 
   @property
@@ -425,6 +426,7 @@ class Controller():
       self._CRYPT_H = 0xFF00 & self._encryptionKey
     elif register == Registers.CRYPT_L:
       self._CRYPT_L = 0xFF & self._encryptionKey
+
     self._writeRegister(register = register)
 
   # # write configuration to physical register

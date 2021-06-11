@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-from waveshareSX126 import sx1268
+from wssx126 import sx1268
 
 import time
 import traceback
@@ -13,6 +13,7 @@ if __name__ == '__main__':
   controller = sx1268.Controller()
 
   try:
+    controller.initialize()
 
     # set HAT address to 0xB8
     controller.address = 0xB8

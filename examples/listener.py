@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-from waveshareSX126 import sx1268
+from wssx126 import sx1268
 
 import traceback
 
@@ -14,9 +14,11 @@ if __name__ == '__main__':
   # networkID : 0x0
   # channel   : 0x0 
   # mode      : configuration
-  controller = sx1268.Controller(serialPipe = "/dev/ttyAMA0")
+  controller = sx1268.Controller()
 
   try:
+
+    controller.initialize(serialPipe = "/dev/ttyAMA0")
 
     # set HAT address to be broadcast & monitor 0xFFFF
     controller.address = 0xFFFF
